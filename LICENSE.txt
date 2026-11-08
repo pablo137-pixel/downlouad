@@ -11,3 +11,4 @@ O software é fornecido "como está", sem garantias de qualquer tipo. O usuário
 ou negar cada ação pedida pela IA e pelas chaves de API que usar.
 
 (Modelo genérico: revise com um advogado antes de vender.)
+
