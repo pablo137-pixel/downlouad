@@ -1,0 +1,13 @@
+Pet Desktop - Copyright (c) 2026. Todos os direitos reservados.
+
+O Pet Desktop é licenciado, não vendido. Os arquivos .exe distribuídos nas Releases deste repositório
+podem ser usados para fins pessoais. A versão Pro exige uma chave de licença válida.
+
+É proibido, sem autorização por escrito: copiar o software (exceto para uso pessoal), redistribuí-lo,
+revendê-lo, sublicenciá-lo, descompilá-lo ou fazer engenharia reversa, ou remover avisos e a verificação
+de licença, exceto quando a lei permitir expressamente.
+
+O software é fornecido "como está", sem garantias de qualquer tipo. O usuário é responsável por aprovar
+ou negar cada ação pedida pela IA e pelas chaves de API que usar.
+
+(Modelo genérico: revise com um advogado antes de vender.)

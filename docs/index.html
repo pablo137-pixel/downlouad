@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pet Desktop — um bichinho de IA que vive na sua tela</title>
+<meta name="description" content="Um bichinho fofo que anda pela sua tela e, com a sua chave de IA (Gemini, Claude, ChatGPT, Groq…), abre sites, organiza arquivos e muito mais. Sempre pedindo a sua permissão.">
+<meta property="og:title" content="Pet Desktop — um bichinho de IA que vive na sua tela">
+<meta property="og:description" content="Beta grátis. Versão Pro com skins que você desenha no Paint.">
+<style>
+  :root{
+    --bg:#f7f8ff; --card:#ffffff; --text:#1d1f3a; --muted:#5b6082; --line:#e3e6fb;
+    --accent:#5a78e0; --accent2:#7c9cff; --accent-ink:#ffffff; --soft:#eef1ff; --warn:#a33;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#12142a; --card:#1b1e3b; --text:#eceeff; --muted:#a3a8cf; --line:#2d3160;
+      --accent:#7c9cff; --accent2:#5a78e0; --accent-ink:#0f1230; --soft:#232754; --warn:#ff8a8a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12142a; --card:#1b1e3b; --text:#eceeff; --muted:#a3a8cf; --line:#2d3160;
+    --accent:#7c9cff; --accent2:#5a78e0; --accent-ink:#0f1230; --soft:#232754; --warn:#ff8a8a;
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.55}
+  a{color:var(--accent)}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+  header{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px}
+  .brand{font-weight:800;text-decoration:none;color:var(--text);display:flex;gap:8px;align-items:center}
+  nav a{margin-left:18px;text-decoration:none;color:var(--muted);font-weight:600;font-size:.95rem}
+  nav a:hover{color:var(--text)}
+  .btn{display:inline-block;border:0;border-radius:12px;padding:13px 22px;font-weight:700;font-size:1rem;
+    text-decoration:none;cursor:pointer;background:var(--accent);color:var(--accent-ink);
+    box-shadow:0 6px 18px color-mix(in srgb,var(--accent) 35%,transparent);transition:transform .15s}
+  .btn:hover{transform:translateY(-2px)}
+  .btn.ghost{background:transparent;color:var(--text);border:2px solid var(--line);box-shadow:none}
+  .btn[aria-disabled="true"]{opacity:.55;pointer-events:none;box-shadow:none}
+  .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center;padding:64px 0 40px}
+  h1{font-size:clamp(2rem,5vw,3.2rem);line-height:1.1;margin:0 0 16px;letter-spacing:-.02em}
+  h1 span{background:linear-gradient(90deg,var(--accent),#ff7fa8);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lead{font-size:1.15rem;color:var(--muted);margin:0 0 24px;max-width:34em}
+  .cta{display:flex;gap:12px;flex-wrap:wrap}
+  .small{font-size:.88rem;color:var(--muted)}
+  .stage{background:linear-gradient(160deg,var(--soft),transparent);border:1px solid var(--line);
+    border-radius:28px;padding:30px;display:grid;place-items:center;position:relative;min-height:300px}
+  .pet{width:min(240px,60vw);animation:bob 2.4s ease-in-out infinite;cursor:pointer}
+  .pet:active{animation:jump .5s}
+  @keyframes bob{50%{transform:translateY(-8px)}}
+  @keyframes jump{40%{transform:translateY(-40px) scale(1.04,.96)}}
+  .bubble{position:absolute;top:20px;right:20px;background:var(--card);border:2px solid var(--text);
+    border-radius:14px;padding:8px 12px;font-weight:700;font-size:.9rem;max-width:180px}
+  section{padding:56px 0}
+  h2{font-size:clamp(1.5rem,3.5vw,2.1rem);margin:0 0 8px;letter-spacing:-.01em}
+  .sub{color:var(--muted);margin:0 0 28px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px}
+  .card h3{margin:.2em 0 .3em;font-size:1.1rem}
+  .card p{margin:0;color:var(--muted)}
+  .ico{font-size:1.7rem}
+  .steps{counter-reset:s;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .steps .card{position:relative;padding-top:34px}
+  .steps .card::before{counter-increment:s;content:counter(s);position:absolute;top:-14px;left:20px;
+    width:32px;height:32px;border-radius:50%;background:var(--accent);color:var(--accent-ink);
+    display:grid;place-items:center;font-weight:800}
+  .plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;align-items:stretch}
+  .plan{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:26px;display:flex;flex-direction:column}
+  .plan.pro{border-color:var(--accent);box-shadow:0 10px 30px color-mix(in srgb,var(--accent) 22%,transparent)}
+  .tag{align-self:flex-start;background:var(--soft);color:var(--accent);font-weight:800;font-size:.75rem;
+    padding:4px 10px;border-radius:99px;letter-spacing:.04em;text-transform:uppercase}
+  .price{font-size:2.4rem;font-weight:800;margin:10px 0 2px}
+  .plan ul{list-style:none;padding:0;margin:14px 0 22px;display:grid;gap:8px;flex:1}
+  .plan li::before{content:"✓";color:var(--accent);font-weight:900;margin-right:8px}
+  .plan li.no{color:var(--muted)} .plan li.no::before{content:"–";color:var(--muted)}
+  .country{display:flex;gap:8px;align-items:center;margin:0 0 18px;flex-wrap:wrap}
+  select{font:inherit;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text)}
+  details{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:0 0 10px}
+  summary{cursor:pointer;font-weight:700}
+  details p{color:var(--muted);margin:.6em 0 0}
+  footer{border-top:1px solid var(--line);padding:30px 0 50px;color:var(--muted);font-size:.9rem}
+  .legal{margin-top:14px;font-size:.82rem}
+  @media (max-width:760px){.hero{grid-template-columns:1fr;padding-top:36px} nav a.opt{display:none}}
+  @media (prefers-reduced-motion: reduce){.pet{animation:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#"><span aria-hidden="true">🐾</span> Pet Desktop</a>
+    <nav>
+      <a class="opt" href="#recursos">Recursos</a>
+      <a class="opt" href="#como">Como usar</a>
+      <a href="#precos">Preços</a>
+      <a class="opt" href="#faq">Dúvidas</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <div>
+      <h1>Um bichinho que vive na sua tela — e <span>obedece à sua IA</span></h1>
+      <p class="lead">Ele anda, dorme, faz barulhinhos e, com a sua própria chave de IA (Gemini, Claude, ChatGPT, Groq…), vira um assistente que abre sites, pesquisa e cria lembretes e notas — e, no Pro, também organiza arquivos e controla o PC. <strong>Sempre pedindo a sua permissão antes.</strong></p>
+      <div class="cta">
+        <a class="btn" id="dl-beta" href="#">⬇ Baixar o Beta grátis</a>
+        <a class="btn ghost" href="#precos">Quero o Pro</a>
+      </div>
+      <p class="small" style="margin-top:14px">Para Windows 10 e 11 · sem cadastro · seus dados ficam no seu PC</p>
+    </div>
+    <div class="stage" aria-hidden="true">
+      <div class="bubble" id="bubble">Oi! Clica em mim :)</div>
+      <svg class="pet" id="pet" viewBox="0 0 120 120" role="img" aria-label="O bichinho azul do Pet Desktop">
+        <path d="M92 92 Q104 82 106 64" stroke="#5a78e0" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <ellipse cx="46" cy="106" rx="11" ry="6" fill="#5a78e0"/><ellipse cx="74" cy="106" rx="11" ry="6" fill="#5a78e0"/>
+        <polygon points="30,50 36,22 54,42" fill="#7c9cff" stroke="#5a78e0" stroke-width="3" stroke-linejoin="round"/>
+        <polygon points="90,50 84,22 66,42" fill="#7c9cff" stroke="#5a78e0" stroke-width="3" stroke-linejoin="round"/>
+        <polygon points="35,46 37,32 47,42" fill="#ff9bb3"/><polygon points="85,46 83,32 73,42" fill="#ff9bb3"/>
+        <ellipse cx="60" cy="72" rx="38" ry="34" fill="#7c9cff" stroke="#5a78e0" stroke-width="3"/>
+        <ellipse cx="60" cy="90" rx="21" ry="15" fill="#dfe8ff"/>
+        <g id="eyes"><circle cx="45" cy="64" r="9" fill="#fff" stroke="#222244" stroke-width="2.5"/><circle cx="75" cy="64" r="9" fill="#fff" stroke="#222244" stroke-width="2.5"/>
+        <circle id="pl" cx="46" cy="65" r="4.2" fill="#222244"/><circle id="pr" cx="76" cy="65" r="4.2" fill="#222244"/></g>
+        <ellipse cx="33" cy="78" rx="6" ry="3.5" fill="#ff9bb3"/><ellipse cx="87" cy="78" rx="6" ry="3.5" fill="#ff9bb3"/>
+        <path d="M54 78 Q57 83 60 78 Q63 83 66 78" stroke="#222244" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <section id="recursos">
+    <h2>Pequeno, fofo e esperto</h2>
+    <p class="sub">Um pet de desktop de verdade, com cérebro de IA opcional.</p>
+    <div class="grid">
+      <div class="card"><div class="ico">🐱</div><h3>Vivo de verdade</h3><p>Anda pela tela, dorme roncando, pisca, segue o seu mouse e pula quando você faz carinho.</p></div>
+      <div class="card"><div class="ico">🧠</div><h3>IA com a sua chave</h3><p>Funciona com Gemini, Claude, ChatGPT, Groq, OpenRouter ou um modelo local. Você escolhe e paga só o que usar.</p></div>
+      <div class="card"><div class="ico">🛡️</div><h3>Sempre pede permissão</h3><p>Antes de abrir um site, mexer num arquivo ou rodar um comando, ele mostra exatamente o que vai fazer. Tem botão de “parar tudo”.</p></div>
+      <div class="card"><div class="ico">🔊</div><h3>Sons e reações</h3><p>Miados, “boing”, roncos e balões de fala. Tudo gerado dentro do app, sem baixar nada.</p></div>
+      <div class="card"><div class="ico">🔒</div><h3>Seus dados são seus</h3><p>Sua chave e suas conversas ficam só no seu PC. Não existe conta nem servidor nosso no meio.</p></div>
+      <div class="card"><div class="ico">🎨</div><h3>Pro: deixe do seu jeito</h3><p>Desenhe o pet no Paint, mude a cor, dê nome e personalidade, escreva as frases dele e libere o controle total do PC pela IA.</p></div>
+    </div>
+  </section>
+
+  <section id="como">
+    <h2>Como usar</h2>
+    <p class="sub">Menos de dois minutos.</p>
+    <div class="steps">
+      <div class="card"><h3>Baixe e abra</h3><p>Baixe o <code>.exe</code>, abra e o pet aparece na sua tela. Não precisa instalar.</p></div>
+      <div class="card"><h3>Cole a sua chave</h3><p>Botão direito no pet › <em>Configurar IA</em>, escolha o provedor e cole a chave. Dá para testar ali mesmo.</p></div>
+      <div class="card"><h3>Peça o que quiser</h3><p>Dois cliques no pet e escreva: “abre o YouTube”, “organiza meus downloads”, “me lembra de beber água em 20 min”.</p></div>
+    </div>
+  </section>
+
+  <section id="precos">
+    <h2>Preços</h2>
+    <p class="sub">Pagamento único, sem assinatura.</p>
+    <div class="country">
+      <label for="country" class="small">Seu país:</label>
+      <select id="country">
+        <option value="BR">Brasil</option><option value="US">Estados Unidos</option>
+        <option value="OTHER">Outro país</option>
+      </select>
+    </div>
+    <div class="plans">
+      <div class="plan">
+        <span class="tag">Beta</span>
+        <div class="price">Grátis</div><div class="small">enquanto estiver em beta</div>
+        <ul>
+          <li>Pet animado com sons e reações</li>
+          <li>Assistente de IA: abre sites, pesquisa, notas e lembretes</li>
+          <li>Permissão obrigatória para cada ação</li>
+          <li class="no">Skins, cor, nome e frases personalizados</li>
+          <li class="no">Controle total do PC pela IA (arquivos, comandos, tela)</li>
+        </ul>
+        <a class="btn ghost" id="dl-beta2" href="#">⬇ Baixar Beta</a>
+      </div>
+      <div class="plan pro">
+        <span class="tag">Pro</span>
+        <div class="price" id="price">—</div><div class="small" id="payNote">pagamento único</div>
+        <ul>
+          <li>Tudo do Beta</li>
+          <li>Skins que você desenha no Paint (com modelo pronto)</li>
+          <li>Cor, nome e personalidade do pet, e frases próprias</li>
+          <li>Controle total do PC pela IA: arquivos, comandos, tela, mouse e teclado (sempre com permissão)</li>
+          <li>Licença vitalícia desta versão e atualizações do Pro</li>
+        </ul>
+        <a class="btn" id="buy" href="#" aria-disabled="true">Comprar o Pro</a>
+        <p class="small" id="buyNote" style="margin:10px 0 0"></p>
+      </div>
+    </div>
+    <p class="small" style="margin-top:14px">O valor é ajustado ao seu país. Depois do pagamento você recebe uma chave de licença, cola no app (<em>botão direito › Personalizar › Ativar licença</em>) e as skins são liberadas. <a id="dl-pro" href="#">Baixar o app Pro</a> (ele só libera as skins com a chave).</p>
+  </section>
+
+  <section id="faq">
+    <h2>Dúvidas</h2>
+    <details><summary>O Windows mostrou “O Windows protegeu o seu PC”. É seguro?</summary>
+      <p>Como o app é novo e ainda não tem o certificado de assinatura (que é pago), o Windows e alguns antivírus desconfiam de programas pouco conhecidos. Você pode conferir o código-fonte e a soma de verificação (SHA256) na página de downloads. Se confiar, clique em “Mais informações › Executar assim mesmo”.</p></details>
+    <details><summary>A IA pode fazer coisas erradas no meu PC?</summary>
+      <p>Ela só age depois que você aprova cada ação numa janela que mostra o comando, o arquivo ou o site exato. Ações perigosas aparecem com aviso vermelho, algumas coisas (como mexer em pastas do sistema ou no antivírus) são bloqueadas e o botão “Parar tudo” interrompe qualquer tarefa. Mesmo assim, leia antes de aprovar: IAs erram.</p></details>
+    <details><summary>Quanto custa a IA?</summary>
+      <p>O app não cobra pela IA. Você usa a sua chave de API do provedor que escolher. Gemini e Groq têm planos gratuitos com limite de uso; Claude e ChatGPT cobram por uso, separado de qualquer assinatura de chat.</p></details>
+    <details><summary>O que é enviado para a internet?</summary>
+      <p>Só o que você escreve para a IA, e o resultado das ações que você aprovar (por exemplo, o conteúdo de um arquivo que você deixou o pet ler), direto para o provedor que você escolheu. Nada passa por servidores nossos.</p></details>
+    <details><summary>Funciona no Mac ou no Linux?</summary>
+      <p>Por enquanto só no Windows 10 e 11.</p></details>
+    <details><summary>Como funciona a licença do Pro? Posso pedir reembolso?</summary>
+      <p>O arquivo <code>PetDesktop-Pro.exe</code> é público, mas só libera os recursos Pro com o seu código de licença, que você cola no app (sem precisar de internet). Reembolso: peça pelo e-mail de contato em até 1 dia e 5 horas (29 horas) depois da compra e devolvemos o valor.</p></details>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>© <span id="year"></span> Pet Desktop · <a id="gh" href="#">GitHub</a> · <a id="mail" href="#">Contato</a></div>
+    <p class="legal">O Pet Desktop é fornecido “como está”, sem garantias. A IA pode errar: você é responsável por aprovar ou negar cada ação. É um software proprietário: é proibido copiar, redistribuir, revender ou fazer engenharia reversa. Marcas como Gemini, Claude, ChatGPT e Groq pertencem aos seus donos e não têm ligação com este projeto. Sobre privacidade: não coletamos dados; sua chave de API e suas conversas ficam armazenadas só no seu computador.</p>
+  </div>
+</footer>
+
+<script>
+// ===================== CONFIGURE AQUI =====================
+const CONFIG = {
+  repo: "pablo137-pixel/downlouad",   // repositório PÚBLICO (site + downloads); o código fica só no seu PC
+  email: "pabloeduardohonorato@gmail.com",         // contato, compra e reembolso
+  // Link de pagamento (Mercado Pago, PayPal...). Vazio = o botão abre um e-mail pedindo o Pro.
+  buyLinks: { BR: "", default: "" },
+  payNote: { BR: "Pix ou cartão · pagamento único", default: "pagamento único" },
+  buyNote: { BR: "Depois do pagamento, a chave de licença chega no e-mail da compra.",
+             default: "Depois do pagamento, a chave de licença chega no e-mail da compra." },
+  buyNoteMail: "Você recebe as instruções de pagamento por e-mail e, depois de pagar, a chave de licença.",
+  // [moeda, valor] por região
+  prices: { BR: ["BRL", 3.00], US: ["USD", 3.00], OTHER: ["USD", 3.00] }
+};
+// ==========================================================
+const EU = ["DE","FR","ES","IT","PT","NL","BE","AT","IE","FI","GR","LU","SK","SI","EE","LV","LT","MT","CY","HR"];
+const $ = id => document.getElementById(id);
+const rel = f => "https://github.com/" + CONFIG.repo + "/releases/latest/download/" + f;
+
+function guessRegion(){
+  const langs = navigator.languages || [navigator.language || ""];
+  for (const l of langs){
+    const m = /-([A-Za-z]{2})$/.exec(l); if (!m) continue;
+    const c = m[1].toUpperCase();
+    if (CONFIG.prices[c]) return c;
+    if (EU.includes(c)) return "EU";
+    return "OTHER";
+  }
+  const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || "");
+  return /Sao_Paulo|Bahia|Fortaleza|Manaus|Recife|Belem|Cuiaba|Campo_Grande|Noronha|Rio_Branco|Araguaina|Maceio/.test(tz) ? "BR" : "OTHER";
+}
+function showPrice(region){
+  const [cur, amount] = CONFIG.prices[region] || CONFIG.prices.OTHER;
+  let txt;
+  try { txt = new Intl.NumberFormat(navigator.language || "pt-BR", {style:"currency", currency:cur}).format(amount); }
+  catch(e){ txt = amount.toFixed(2) + " " + cur; }
+  $("price").textContent = txt;
+  $("payNote").textContent = CONFIG.payNote[region] || CONFIG.payNote.default;
+  const link = CONFIG.buyLinks[region] || CONFIG.buyLinks.default;
+  const b = $("buy");
+  b.setAttribute("aria-disabled", "false");
+  if (link){
+    b.href = link; b.textContent = "Comprar o Pro";
+    $("buyNote").textContent = CONFIG.buyNote[region] || CONFIG.buyNote.default;
+  } else {
+    const subject = encodeURIComponent("Quero o Pet Desktop Pro");
+    const body = encodeURIComponent("Olá! Quero comprar o Pet Desktop Pro.\nMeu país: " + (region === "BR" ? "Brasil" : region === "US" ? "Estados Unidos" : "outro") + "\nPreço que vi no site: " + txt + "\n");
+    b.href = "mailto:" + CONFIG.email + "?subject=" + subject + "&body=" + body;
+    b.textContent = "Pedir o Pro por e-mail";
+    $("buyNote").textContent = CONFIG.buyNoteMail;
+  }
+}
+const region = guessRegion();
+$("country").value = [...$("country").options].some(o => o.value === region) ? region : "OTHER";
+showPrice($("country").value);
+$("country").addEventListener("change", e => showPrice(e.target.value));
+
+$("dl-beta").href = $("dl-beta2").href = rel("PetDesktop-Beta.exe");
+$("dl-pro").href = rel("PetDesktop-Pro.exe");
+$("gh").href = "https://github.com/" + CONFIG.repo;
+$("mail").href = "mailto:" + CONFIG.email;
+$("year").textContent = new Date().getFullYear();
+
+// o bichinho do site segue o mouse e reage ao clique
+const L = $("pl"), R = $("pr");
+addEventListener("pointermove", e => {
+  const r = $("pet").getBoundingClientRect();
+  const cx = r.left + r.width/2, cy = r.top + r.height/2;
+  const a = Math.atan2(e.clientY - cy, e.clientX - cx);
+  const dx = Math.cos(a)*2.6, dy = Math.sin(a)*2.6;
+  L.setAttribute("cx", 45+dx); L.setAttribute("cy", 64+dy);
+  R.setAttribute("cx", 75+dx); R.setAttribute("cy", 64+dy);
+});
+const talk = ["Oi! Clica em mim :)","Miau!","Baixa o Beta, vai!","Eba!","Bora brincar?","Tem petisco?"];
+let ti = 0;
+$("pet").addEventListener("click", () => { ti = (ti+1) % talk.length; $("bubble").textContent = talk[ti]; });
+</script>
+</body>
+</html>
