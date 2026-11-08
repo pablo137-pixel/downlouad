@@ -73,6 +73,9 @@
   .plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;align-items:stretch}
   .plan{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:26px;display:flex;flex-direction:column}
   .plan.pro{border-color:var(--accent);box-shadow:0 10px 30px color-mix(in srgb,var(--accent) 22%,transparent)}
+  .plan.max{border-color:#ff7fa8;box-shadow:0 10px 30px color-mix(in srgb,#ff7fa8 24%,transparent)}
+  .plan.max .tag{background:color-mix(in srgb,#ff7fa8 18%,var(--card));color:#d6336c}
+  .plan.max .btn{background:linear-gradient(90deg,var(--accent),#ff7fa8);color:#fff}
   .tag{align-self:flex-start;background:var(--soft);color:var(--accent);font-weight:800;font-size:.75rem;
     padding:4px 10px;border-radius:99px;letter-spacing:.04em;text-transform:uppercase}
   .price{font-size:2.4rem;font-weight:800;margin:10px 0 2px}
@@ -162,7 +165,7 @@
       <label for="country" class="small">Seu país:</label>
       <select id="country">
         <option value="BR">Brasil</option><option value="US">Estados Unidos</option>
-        <option value="OTHER">Outro país</option>
+        <option value="EU">Europa (euro)</option><option value="OTHER">Outro país</option>
       </select>
     </div>
     <div class="plans">
@@ -180,19 +183,32 @@
       </div>
       <div class="plan pro">
         <span class="tag">Pro</span>
-        <div class="price" id="price">—</div><div class="small" id="payNote">pagamento único</div>
+        <div class="price" id="price-pro">—</div><div class="small" id="payNote-pro">pagamento único</div>
         <ul>
           <li>Tudo do Beta</li>
           <li>Skins que você desenha no Paint (com modelo pronto)</li>
           <li>Cor, nome e personalidade do pet, e frases próprias</li>
           <li>Controle total do PC pela IA: arquivos, comandos, tela, mouse e teclado (sempre com permissão)</li>
-          <li>Licença vitalícia desta versão e atualizações do Pro</li>
         </ul>
-        <a class="btn" id="buy" href="#" aria-disabled="true">Comprar o Pro</a>
-        <p class="small" id="buyNote" style="margin:10px 0 0"></p>
+        <a class="btn" id="buy-pro" href="#" aria-disabled="true">Comprar o Pro</a>
+        <p class="small" id="buyNote-pro" style="margin:10px 0 0"></p>
+      </div>
+      <div class="plan max">
+        <span class="tag">Max · completo</span>
+        <div class="price" id="price-max">—</div><div class="small" id="payNote-max">pagamento único</div>
+        <ul>
+          <li>Tudo do Pro</li>
+          <li>Conversas salvas: o pet lembra do que vocês falaram</li>
+          <li>Troca de IA com um clique (Gemini, Claude, ChatGPT, Groq…)</li>
+          <li>Lembretes que sobrevivem ao reinício e aviso de pausa</li>
+          <li>Tarefas maiores da IA (até 20 passos por pedido)</li>
+          <li>Atualizações do Max</li>
+        </ul>
+        <a class="btn" id="buy-max" href="#" aria-disabled="true">Comprar o Max</a>
+        <p class="small" id="buyNote-max" style="margin:10px 0 0"></p>
       </div>
     </div>
-    <p class="small" style="margin-top:14px">O valor é ajustado ao seu país. Depois do pagamento você recebe uma chave de licença, cola no app (<em>botão direito › Personalizar › Ativar licença</em>) e as skins são liberadas. <a id="dl-pro" href="#">Baixar o app Pro</a> (ele só libera as skins com a chave).</p>
+    <p class="small" style="margin-top:14px">O valor é ajustado ao seu país. Depois do pagamento você recebe uma chave de licença, cola no app (<em>botão direito › Personalizar › Ativar licença</em>) e os recursos são liberados. <a id="dl-pro" href="#">Baixar o app com licença</a>: é o mesmo arquivo para Pro e Max, ele só libera o que a sua chave permite.</p>
   </section>
 
   <section id="faq">
@@ -207,8 +223,10 @@
       <p>Só o que você escreve para a IA, e o resultado das ações que você aprovar (por exemplo, o conteúdo de um arquivo que você deixou o pet ler), direto para o provedor que você escolheu. Nada passa por servidores nossos.</p></details>
     <details><summary>Funciona no Mac ou no Linux?</summary>
       <p>Por enquanto só no Windows 10 e 11.</p></details>
-    <details><summary>Como funciona a licença do Pro? Posso pedir reembolso?</summary>
-      <p>O arquivo <code>PetDesktop-Pro.exe</code> é público, mas só libera os recursos Pro com o seu código de licença, que você cola no app (sem precisar de internet). Reembolso: peça pelo e-mail de contato em até 1 dia e 5 horas (29 horas) depois da compra e devolvemos o valor.</p></details>
+    <details><summary>Qual a diferença entre Pro e Max?</summary>
+      <p>O Pro libera as skins, a cor, o nome e as frases do pet e o controle total do PC pela IA. O Max inclui tudo isso e mais: conversas salvas, troca de IA com um clique, lembretes que sobrevivem ao reinício, aviso de pausa e tarefas maiores da IA. As conversas salvas ficam só no seu PC, nunca num servidor nosso.</p></details>
+    <details><summary>Como funciona a licença? Posso pedir reembolso?</summary>
+      <p>O arquivo <code>PetDesktop-Pro.exe</code> é público, mas só libera os recursos com o seu código de licença (Pro ou Max, conforme o que você comprou), que você cola no app, sem precisar de internet. Reembolso: peça pelo e-mail de contato em até 1 dia e 5 horas (29 horas) depois da compra e devolvemos o valor.</p></details>
   </section>
 </main>
 
@@ -224,57 +242,64 @@
 const CONFIG = {
   repo: "pablo137-pixel/downlouad",   // repositório PÚBLICO (site + downloads); o código fica só no seu PC
   email: "pabloeduardohonorato@gmail.com",         // contato, compra e reembolso
-  // Link de pagamento (Mercado Pago, PayPal...). Vazio = o botão abre um e-mail pedindo o Pro.
-  buyLinks: { BR: "", default: "" },
+  // Links de pagamento por plano e região (Mercado Pago, PayPal...). Vazio = o botão abre um e-mail pedindo.
+  buyLinks: { pro: { BR: "", default: "" }, max: { BR: "", default: "" } },
   payNote: { BR: "Pix ou cartão · pagamento único", default: "pagamento único" },
   buyNote: { BR: "Depois do pagamento, a chave de licença chega no e-mail da compra.",
              default: "Depois do pagamento, a chave de licença chega no e-mail da compra." },
   buyNoteMail: "Você recebe as instruções de pagamento por e-mail e, depois de pagar, a chave de licença.",
-  // [moeda, valor] por região
-  prices: { BR: ["BRL", 3.00], US: ["USD", 3.00], OTHER: ["USD", 3.00] }
+  // [moeda, valor] por plano e região
+  prices: {
+    pro: { BR: ["BRL", 3.00], default: ["USD", 3.00] },
+    max: { BR: ["BRL", 20.00], US: ["USD", 10.00], EU: ["EUR", 7.00], default: ["USD", 10.00] }
+  }
 };
 // ==========================================================
 const EU = ["DE","FR","ES","IT","PT","NL","BE","AT","IE","FI","GR","LU","SK","SI","EE","LV","LT","MT","CY","HR"];
 const $ = id => document.getElementById(id);
 const rel = f => "https://github.com/" + CONFIG.repo + "/releases/latest/download/" + f;
+const PLANS = { pro: "Pro", max: "Max" };
+const REGION_NAME = { BR: "Brasil", US: "Estados Unidos", EU: "Europa", OTHER: "outro país" };
 
+function regionOf(c){ return (c === "BR" || c === "US") ? c : (EU.includes(c) ? "EU" : "OTHER"); }
 function guessRegion(){
   const langs = navigator.languages || [navigator.language || ""];
   for (const l of langs){
-    const m = /-([A-Za-z]{2})$/.exec(l); if (!m) continue;
-    const c = m[1].toUpperCase();
-    if (CONFIG.prices[c]) return c;
-    if (EU.includes(c)) return "EU";
-    return "OTHER";
+    const m = /-([A-Za-z]{2})$/.exec(l);
+    if (m) return regionOf(m[1].toUpperCase());
   }
   const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || "");
   return /Sao_Paulo|Bahia|Fortaleza|Manaus|Recife|Belem|Cuiaba|Campo_Grande|Noronha|Rio_Branco|Araguaina|Maceio/.test(tz) ? "BR" : "OTHER";
 }
-function showPrice(region){
-  const [cur, amount] = CONFIG.prices[region] || CONFIG.prices.OTHER;
-  let txt;
-  try { txt = new Intl.NumberFormat(navigator.language || "pt-BR", {style:"currency", currency:cur}).format(amount); }
-  catch(e){ txt = amount.toFixed(2) + " " + cur; }
-  $("price").textContent = txt;
-  $("payNote").textContent = CONFIG.payNote[region] || CONFIG.payNote.default;
-  const link = CONFIG.buyLinks[region] || CONFIG.buyLinks.default;
-  const b = $("buy");
-  b.setAttribute("aria-disabled", "false");
-  if (link){
-    b.href = link; b.textContent = "Comprar o Pro";
-    $("buyNote").textContent = CONFIG.buyNote[region] || CONFIG.buyNote.default;
-  } else {
-    const subject = encodeURIComponent("Quero o Pet Desktop Pro");
-    const body = encodeURIComponent("Olá! Quero comprar o Pet Desktop Pro.\nMeu país: " + (region === "BR" ? "Brasil" : region === "US" ? "Estados Unidos" : "outro") + "\nPreço que vi no site: " + txt + "\n");
-    b.href = "mailto:" + CONFIG.email + "?subject=" + subject + "&body=" + body;
-    b.textContent = "Pedir o Pro por e-mail";
-    $("buyNote").textContent = CONFIG.buyNoteMail;
+function showPrices(region){
+  for (const plan of Object.keys(PLANS)){
+    const table = CONFIG.prices[plan];
+    const [cur, amount] = table[region] || table.default;
+    let txt;
+    try { txt = new Intl.NumberFormat(navigator.language || "pt-BR", {style:"currency", currency:cur}).format(amount); }
+    catch(e){ txt = amount.toFixed(2) + " " + cur; }
+    $("price-" + plan).textContent = txt;
+    $("payNote-" + plan).textContent = CONFIG.payNote[region] || CONFIG.payNote.default;
+    const links = CONFIG.buyLinks[plan];
+    const link = links[region] || links.default;
+    const b = $("buy-" + plan);
+    b.setAttribute("aria-disabled", "false");
+    if (link){
+      b.href = link; b.textContent = "Comprar o " + PLANS[plan];
+      $("buyNote-" + plan).textContent = CONFIG.buyNote[region] || CONFIG.buyNote.default;
+    } else {
+      const subject = encodeURIComponent("Quero o Pet Desktop " + PLANS[plan]);
+      const body = encodeURIComponent("Olá! Quero comprar o Pet Desktop " + PLANS[plan] + ".\nMeu país: " + REGION_NAME[region] + "\nPreço que vi no site: " + txt + "\n");
+      b.href = "mailto:" + CONFIG.email + "?subject=" + subject + "&body=" + body;
+      b.textContent = "Pedir o " + PLANS[plan] + " por e-mail";
+      $("buyNote-" + plan).textContent = CONFIG.buyNoteMail;
+    }
   }
 }
 const region = guessRegion();
 $("country").value = [...$("country").options].some(o => o.value === region) ? region : "OTHER";
-showPrice($("country").value);
-$("country").addEventListener("change", e => showPrice(e.target.value));
+showPrices($("country").value);
+$("country").addEventListener("change", e => showPrices(e.target.value));
 
 $("dl-beta").href = $("dl-beta2").href = rel("PetDesktop-Beta.exe");
 $("dl-pro").href = rel("PetDesktop-Pro.exe");
